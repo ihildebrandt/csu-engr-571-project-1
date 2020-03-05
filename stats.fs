@@ -2,6 +2,12 @@
 
 open System
 
+type RankedValue = {
+    Value: float;
+    Group: int;
+    Rank: float;
+}
+
 let summation list = 
     let rec sum list = 
         match list with
@@ -53,3 +59,34 @@ let tscore sampleA sampleB =
         sqrt((1.0/nA) + (1.0/nB))
 
     numerator/denominator
+
+let rankSum param1 param2 =
+    let assignMeanRank values =
+        let ranks = List.map (fun v -> v.Rank) values
+        let meanRank = mean ranks
+        List.map (fun v -> { Value = v.Value; Group = v.Group; Rank = meanRank }) values
+
+    let rec rankValues values equalValues rank = 
+        match values with
+        | [] -> []
+        | a :: [] -> 
+            [{ Value = a.Value; Group = a.Group; Rank = rank}]
+        | a :: b :: rest -> 
+            if a.Value = b.Value then 
+                (rankValues ([b] @ rest) (equalValues @ [{ Value = a.Value; Group = a.Group; Rank = rank }]) (rank + 1.0))
+            else
+                (assignMeanRank (equalValues @ [{ Value = a.Value; Group = a.Group; Rank = rank }])) @
+                (rankValues ([b] @ rest) [] (rank + 1.0))
+
+    let rparam1 = [for v in param1 do yield { Value = v; Group = 1; Rank = 0.0; }]
+    let rparam2 = [for v in param2 do yield { Value = v; Group = 2; Rank = 0.0; }]
+    let scombined = List.sortBy (fun v -> v.Value) (rparam1 @ rparam2)
+    let rcombined = rankValues scombined [] 1.0
+        
+    let rparam1 = Seq.toList (seq { for v in rcombined do if v.Group = 1 then yield v.Rank })
+    let rsum1 = summation rparam1
+            
+    let rparam2 = Seq.toList (seq { for v in rcombined do if v.Group = 2 then yield v.Rank })
+    let rsum2 = summation rparam2
+
+    (rsum1, rsum2)

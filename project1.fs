@@ -146,7 +146,22 @@ let p3() =
     printfn "8.                         Actual: %i / %i = %f" ratioData.Length data.Length ((float ratioData.Length) / (float data.Length)) 
 
 let p4() =
-    printfn "not implemented yet"
+    printfn "Using a T-Test and Wilcoxon Rank Sum: Are the "
+    printfn "number of emails Sent during Holiday weeks "
+    printfn "and Vacation weeks statistically similar? "
+    printfn ""
+
+    let pHoliday = data |> queryForDescription "Holiday" |> getSent |> Seq.toList
+    let pVacation = data |> queryForDescription "Vacation" |> getSent |> Seq.toList
+
+    let tscore = Stats.tscore pHoliday pVacation
+    let (rHoliday, rVacation) = Stats.rankSum pHoliday pVacation
+
+    printfn "T-Score: %f" tscore 
+    printfn "Rank-Sum: "
+    printfn "     Holiday: %i %f" pHoliday.Length rHoliday
+    printfn "    Vacation: %i %f" pVacation.Length rVacation
+    printfn ""
 
 let runProblem problemNumber =
     match problemNumber with
