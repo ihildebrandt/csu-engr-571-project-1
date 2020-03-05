@@ -47,13 +47,7 @@ let rec buildData years =
     match years with 
     | year :: rest -> (readCsvYear year) @ (buildData rest)
     | [] -> []
-
-//let buildData years = 
-//    let mutable data = []
-//    for year in years do
-//        data <- List.append data (readCsvYear year)
-//    data
-
+    
 let data = buildData years
 
 let p1() = 
