@@ -43,11 +43,16 @@ let readCsvYear year =
 let years = [2011;2012;2013;2014;2015;2016;2017]
 let descriptions = ["Normal";"Travel";"Holiday";"Vacation";"Announcement"]
 
-let buildData years = 
-    let mutable data = []
-    for year in years do
-        data <- List.append data (readCsvYear year)
-    data
+let rec buildData years = 
+    match years with 
+    | year :: rest -> (readCsvYear year) @ (buildData rest)
+    | [] -> []
+
+//let buildData years = 
+//    let mutable data = []
+//    for year in years do
+//        data <- List.append data (readCsvYear year)
+//    data
 
 let data = buildData years
 
